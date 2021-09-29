@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 
-video = "video_test\\205_78.247_Tr_cookies_-_Cookie_Clicker_2021-09-27_23-40-16.mp4"
+video = "video_test\Desktop 2021.09.28 - 18.08.59.02.mp4"
 cap = cv2.VideoCapture(video)
 
 
@@ -88,7 +88,7 @@ while True:
 
     getContours(imgDil, imgContour)
 
-    imgStack = stackImages(0.8, [img, imgDil, imgContour])
+    imgStack = stackImages(0.4, [img, imgDil, imgContour])
     cv2.imshow("Result", imgStack)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
