@@ -3,7 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 
-video = "video_test\\205_78.247_Tr_cookies_-_Cookie_Clicker_2021-09-27_23-40-16.mp4"
+# choose video file
+video = 'video_test\\205_78.247_Tr_cookies_-_Cookie_Clicker_2021-09-27_23-40-16.mp4'
 cap = cv2.VideoCapture(video)
 
 
@@ -11,6 +12,7 @@ def empty(a):
     pass
 
 
+# slider window details
 cv2.namedWindow("Parameters")
 cv2.resizeWindow("Parameters", 640, 240)
 cv2.createTrackbar("Threshold1", "Parameters", 185, 255, empty)
@@ -58,7 +60,7 @@ def stackImages(scale, imgArray):
 # runtime
 while True:
     success, img = cap.read()
-    imgContour = img.copy()
+    imgCookies = img.copy()
 
     imgBlur = cv2.GaussianBlur(img, (7, 7), 1)
     imgGray = cv2.cvtColor(imgBlur, cv2.COLOR_BGR2GRAY)
@@ -69,8 +71,23 @@ while True:
     kernel = np.ones((5, 5))
     imgDil = cv2.dilate(imgCanny, kernel, iterations=1)
 
-    def getContours(img, imgContour):
-        contours, hierarchy = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    def getCookies(img, imgCookies):
+        detected_circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, 20, param1 = 50, param2 = 30, minRadius = 1, maxRadius = 40)
+  
+        # Draw circles that are detected.
+        if detected_circles is not None:
+            # Convert the circle parameters a, b and r to integers.
+            detected_circles = np.uint16(np.around(detected_circles))
+            for pt in detected_circles[0, :]:
+                a, b, r = pt[0], pt[1], pt[2]
+                # Draw the circumference of the circle.
+                cv2.circle(img, (a, b), r, (0, 255, 0), 2)
+                # Draw a small circle (of radius 1) to show the center.
+                cv2.circle(img, (a, b), 1, (0, 0, 255), 3)
+                cv2.imshow("Detected Circle", img)
+                cv2.waitKey(0)
+        
+        '''contours, hierarchy = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
         for cnt in contours:
             area = cv2.contourArea(cnt)
@@ -83,12 +100,12 @@ while True:
                 cv2.rectangle(imgContour, (x, y), (x + w, y + h), (0, 255, 0), 5)
 
                 cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w + 20, y + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-                cv2.putText(imgContour, "Area: " + str(int(area)), (x + w + 20, y + 45), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                cv2.putText(imgContour, "Area: " + str(int(area)), (x + w + 20, y + 45), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)'''
 
 
-    getContours(imgDil, imgContour)
+    getCookies(imgDil, imgCookies)
 
-    imgStack = stackImages(0.8, [img, imgDil, imgContour])
-    cv2.imshow("Result", imgStack)
+    
+    cv2.imshow("Result", imgCookies)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break

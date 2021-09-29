@@ -131,3 +131,4 @@ dmypy.json
 # Custom
 .idea
 video_test
+image_test
